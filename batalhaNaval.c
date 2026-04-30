@@ -1,63 +1,80 @@
 #include <stdio.h>
 
-#define TAM 10        // Tamanho do tabuleiro (10x10)
-#define NAVIO_TAM 3   // Tamanho fixo dos navios
+#define TAM 10
+#define NAVIO_TAM 3
 
-int main() {
-    int tabuleiro[TAM][TAM];
-
+// inicializar tabuleiro
+void inicializarTabuleiro(int tab[TAM][TAM]) {
     for (int i = 0; i < TAM; i++) {
         for (int j = 0; j < TAM; j++) {
-            tabuleiro[i][j] = 0;
+            tab[i][j] = 0;
         }
     }
+}
 
-    int navio_horizontal[NAVIO_TAM] = {3, 3, 3};
-    int navio_vertical[NAVIO_TAM] = {3, 3, 3};
-
-    int linha_h = 2, coluna_h = 4;
-    int linha_v = 5, coluna_v = 7;
-
-    if (coluna_h + NAVIO_TAM > TAM) {
-        printf("Erro: Navio horizontal fora dos limites!\n");
-        return 1;
-    }
-
-    if (linha_v + NAVIO_TAM > TAM) {
-        printf("Erro: Navio vertical fora dos limites!\n");
-        return 1;
-    }
-
+// validar posição
+int podePosicionar(int tab[TAM][TAM], int linha, int coluna, int dLinha, int dColuna) {
     for (int i = 0; i < NAVIO_TAM; i++) {
-        if (tabuleiro[linha_h][coluna_h + i] != 0) {
-            printf("Erro: Sobreposição no navio horizontal!\n");
-            return 1;
+        int l = linha + i * dLinha;
+        int c = coluna + i * dColuna;
+
+        if (l < 0 || l >= TAM || c < 0 || c >= TAM) {
+            return 0;
+        }
+
+        if (tab[l][c] != 0) {
+            return 0;
         }
     }
+    return 1;
+}
 
+void posicionarNavio(int tab[TAM][TAM], int linha, int coluna, int dLinha, int dColuna) {
     for (int i = 0; i < NAVIO_TAM; i++) {
-        if (tabuleiro[linha_v + i][coluna_v] != 0) {
-            printf("Erro: Sobreposição no navio vertical!\n");
-            return 1;
-        }
+        int l = linha + i * dLinha;
+        int c = coluna + i * dColuna;
+        tab[l][c] = 3;
     }
+}
 
-    for (int i = 0; i < NAVIO_TAM; i++) {
-        tabuleiro[linha_h][coluna_h + i] = navio_horizontal[i];
-    }
-
-    for (int i = 0; i < NAVIO_TAM; i++) {
-        tabuleiro[linha_v + i][coluna_v] = navio_vertical[i];
-    }
-
+//imprimir tabuleiro
+void imprimirTabuleiro(int tab[TAM][TAM]) {
     printf("\nTabuleiro Batalha Naval (10x10):\n\n");
 
     for (int i = 0; i < TAM; i++) {
         for (int j = 0; j < TAM; j++) {
-            printf("%d ", tabuleiro[i][j]);
+            printf("%d ", tab[i][j]);
         }
         printf("\n");
     }
+}
+
+int main() {
+    int tabuleiro[TAM][TAM];
+
+    inicializarTabuleiro(tabuleiro);
+
+    // Horizontal
+    if (podePosicionar(tabuleiro, 1, 2, 0, 1)) {
+        posicionarNavio(tabuleiro, 1, 2, 0, 1);
+    }
+
+    // Vertical
+    if (podePosicionar(tabuleiro, 4, 5, 1, 0)) {
+        posicionarNavio(tabuleiro, 4, 5, 1, 0);
+    }
+
+    // Diagonal principal
+    if (podePosicionar(tabuleiro, 6, 1, 1, 1)) {
+        posicionarNavio(tabuleiro, 6, 1, 1, 1);
+    }
+
+    // Diagonal secundária
+    if (podePosicionar(tabuleiro, 0, 9, 1, -1)) {
+        posicionarNavio(tabuleiro, 0, 9, 1, -1);
+    }
+
+    imprimirTabuleiro(tabuleiro);
 
     return 0;
 }
